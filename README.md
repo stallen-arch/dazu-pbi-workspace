@@ -1,2 +1,2 @@
 # dazu-pbi-workspace
-parent proj für dazu-pbi und sap-bo
+parent projekt für dazu-pbi und sap-bo
