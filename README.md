@@ -10,7 +10,10 @@ cd pbi-git
 ./init.sh
 ```
 
-`init.sh` richtet die (hier git-ignorierten) Sub-Repos ein; mehrfaches Ausführen ist unkritisch.
+Voraussetzungen: Git (unter Windows Git Bash), Python >= 3.9, SSH-Zugang zu GitHub.
+
+`init.sh` richtet die (hier git-ignorierten) Sub-Repos ein und installiert die Python-Pakete aus
+`requirements.txt` (für `sap-bo/*/generate_*.py`, `sap-bo/validate_pbir.py`); mehrfaches Ausführen ist unkritisch.
 
 | Ordner          | Quelle                              | Branch |
 |-----------------|-------------------------------------|--------|

@@ -10,8 +10,13 @@
 #   dazu-pbi-prod  -> git worktree of dazu-pbi-test, branch prod
 #   sap-bo         -> clone of stallen-arch/sap-bo, branch main
 #
+# It also installs the Python packages (requirements.txt) needed by the scripts
+# in sap-bo (generate_*.py, validate_pbir.py).
+#
 # The sub repos are git-ignored by this parent repo. Re-running the script is
 # safe: existing folders are left untouched (use ./pull-all.sh to update them).
+#
+# Prerequisites: git, Python >= 3.9, SSH access to GitHub (stallen-arch).
 #
 # Usage:
 #   ./init.sh                                   # SSH remotes (default)
@@ -82,6 +87,26 @@ else
     ok sap-bo "cloned"
   else
     fail sap-bo "clone error"
+  fi
+fi
+
+# --- Python dependencies for the generator/validator scripts in sap-bo --------
+PY=""
+for cand in python3 python py; do
+  if command -v "${cand}" > /dev/null && "${cand}" -c "import sys; sys.exit(sys.version_info < (3, 9))" 2> /dev/null; then
+    PY="${cand}"
+    break
+  fi
+done
+
+if [[ -z "${PY}" ]]; then
+  fail python "Python >= 3.9 not found in PATH"
+else
+  echo "== Installing Python requirements (${PY})"
+  if "${PY}" -m pip install --user -q -r "${REPO_ROOT}/requirements.txt"; then
+    ok python "requirements installed"
+  else
+    fail python "pip install error"
   fi
 fi
 
