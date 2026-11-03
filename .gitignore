@@ -1,0 +1,8 @@
+# Eigene Git-Repos (separat versioniert)
+/dazu-pbi-int/
+/dazu-pbi-test/
+/dazu-pbi-prod/
+/sap-bo/
+
+# IDE
+/.idea/
