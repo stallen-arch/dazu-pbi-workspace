@@ -91,16 +91,31 @@ else
 fi
 
 # --- Python dependencies for the generator/validator scripts in sap-bo --------
+# Prefer an interpreter that already has pip; remember a pip-less one as fallback
+# (e.g. Git Bash/MSYS python3, embeddable or minimal installs have no pip module).
 PY=""
+PY_NOPIP=""
 for cand in python3 python py; do
   if command -v "${cand}" > /dev/null && "${cand}" -c "import sys; sys.exit(sys.version_info < (3, 9))" 2> /dev/null; then
-    PY="${cand}"
-    break
+    if "${cand}" -m pip --version > /dev/null 2>&1; then
+      PY="${cand}"
+      break
+    fi
+    [[ -z "${PY_NOPIP}" ]] && PY_NOPIP="${cand}"
   fi
 done
 
+if [[ -z "${PY}" && -n "${PY_NOPIP}" ]]; then
+  echo "== '${PY_NOPIP}' has no pip module, trying ensurepip"
+  if "${PY_NOPIP}" -m ensurepip --user > /dev/null 2>&1 && "${PY_NOPIP}" -m pip --version > /dev/null 2>&1; then
+    PY="${PY_NOPIP}"
+  else
+    fail python "'${PY_NOPIP}' has no pip. Install Python >= 3.9 from python.org (with pip) or run '${PY_NOPIP} -m ensurepip --user'"
+  fi
+fi
+
 if [[ -z "${PY}" ]]; then
-  fail python "Python >= 3.9 not found in PATH"
+  [[ -z "${PY_NOPIP}" ]] && fail python "Python >= 3.9 not found in PATH"
 else
   echo "== Installing Python requirements (${PY})"
   if "${PY}" -m pip install --user -q -r "${REPO_ROOT}/requirements.txt"; then
